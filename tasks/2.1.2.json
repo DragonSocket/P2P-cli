@@ -1,0 +1,6 @@
+{
+  "id": "2.1.2",
+  "type": "GREEN-LINUX",
+  "desc": "Implement LinuxSystemConfigurator (iptables, ethtool, ip link).",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/linux_config.py"
+}

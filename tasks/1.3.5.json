@@ -1,0 +1,6 @@
+{
+  "id": "1.3.5",
+  "type": "REFACTOR",
+  "desc": "Update vpn_node.py call-sites from dict['key'] to object.key.",
+  "target": "project_root"
+}

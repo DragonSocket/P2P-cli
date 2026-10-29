@@ -1,0 +1,6 @@
+{
+  "id": "3.2.5",
+  "type": "GREEN",
+  "desc": "Implement IPCController in controller.py (bridge to VPNEngine).",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/ipc/controller.py"
+}

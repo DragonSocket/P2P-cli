@@ -1,0 +1,6 @@
+{
+  "id": "2.3.3",
+  "type": "VERIFY",
+  "desc": "Run transport integration tests (UDP connectivity).",
+  "target": "tests/p2pvpn_daemon/transport/udp/test_udp_transport.py"
+}

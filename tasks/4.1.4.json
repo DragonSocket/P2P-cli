@@ -1,0 +1,6 @@
+{
+  "id": "4.1.4",
+  "type": "VERIFY",
+  "desc": "Run status command tests.",
+  "target": "tests/p2pvpn_cli/test_cli.py"
+}

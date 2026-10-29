@@ -1,0 +1,6 @@
+{
+  "id": "3.2.2",
+  "type": "GREEN",
+  "desc": "Implement IPC server (Unix socket / TCP loopback) in server.py.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/ipc/server.py"
+}

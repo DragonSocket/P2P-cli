@@ -1,0 +1,6 @@
+{
+  "id": "2.1.1",
+  "type": "RED",
+  "desc": "Create BaseSystemConfigurator (ABC) and failing tests mocking os behavior.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/base_config.py"
+}

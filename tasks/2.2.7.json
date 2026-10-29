@@ -1,0 +1,6 @@
+{
+  "id": "2.2.7",
+  "type": "VERIFY",
+  "desc": "Run full TAP integration tests (Interface + Configurator).",
+  "target": "tests/p2pvpn_daemon/interface/test_tap.py"
+}

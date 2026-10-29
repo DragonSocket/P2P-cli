@@ -1,0 +1,6 @@
+{
+  "id": "2.2.3",
+  "type": "GREEN-WIN",
+  "desc": "Implement WindowsTAP(BaseTAPInterface) with SystemConfigurator injected.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/windows_tap.py"
+}

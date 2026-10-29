@@ -1,0 +1,6 @@
+{
+  "id": "2.2.1",
+  "type": "RED",
+  "desc": "Create BaseTAPInterface (ABC) and failing tests in tests/p2pvpn_daemon/interface/test_base.py.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/base.py"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "2.4.2",
+  "type": "GREEN",
+  "desc": "Implement PeerManager with two-threshold state logic.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/core/peer_manager.py"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "4.1.9",
+  "type": "GREEN",
+  "desc": "Implement CLI stop command.",
+  "target": "packages/p2pvpn_cli/p2pvpn_cli/main.py"
+}

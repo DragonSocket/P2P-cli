@@ -1,0 +1,6 @@
+{
+  "id": "2.5.1",
+  "type": "RED",
+  "desc": "Create VPNEngine unit tests using Mock TAP, Mock Transport, and Mock PeerManager.",
+  "target": "tests/p2pvpn_daemon/core/test_engine.py"
+}

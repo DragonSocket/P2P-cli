@@ -1,0 +1,6 @@
+{
+  "id": "2.2.4",
+  "type": "RED",
+  "desc": "Create TAPDevice factory tests in tests/p2pvpn_daemon/interface/test_factory.py.",
+  "target": "tests/p2pvpn_daemon/interface/test_factory.py"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "2.3.2",
+  "type": "GREEN",
+  "desc": "Implement UDPTransport(BaseTransport) with asyncio.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/transport/udp/udp_transport.py"
+}

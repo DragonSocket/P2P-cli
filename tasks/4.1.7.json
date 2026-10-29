@@ -1,0 +1,6 @@
+{
+  "id": "4.1.7",
+  "type": "VERIFY",
+  "desc": "Run add-peer command tests.",
+  "target": "tests/p2pvpn_cli/test_cli.py"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "1.4.1",
+  "type": "RED",
+  "desc": "Create tests in tests/p2pvpn_common/test_constants.py.",
+  "target": "tests/p2pvpn_common/test_constants.py"
+}

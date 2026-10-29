@@ -1,0 +1,6 @@
+{
+  "id": "2.5.3",
+  "type": "VERIFY",
+  "desc": "Run full Engine orchestration integration test (Mock TAP $\\leftrightarrow$ Mock Transport).",
+  "target": "tests/p2pvpn_daemon/core/test_engine.py"
+}

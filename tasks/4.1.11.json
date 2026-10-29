@@ -1,0 +1,6 @@
+{
+  "id": "4.1.11",
+  "type": "INTEGRATION",
+  "desc": "Run E2E CLI tests (CLI $\\leftrightarrow$ Dummy IPC server).",
+  "target": "tests/p2pvpn_cli/test_e2e_cli.py"
+}

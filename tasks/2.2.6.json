@@ -1,0 +1,6 @@
+{
+  "id": "2.2.6",
+  "type": "SHIM",
+  "desc": "Implement root tap.py as a thin wrapper around the new factory.",
+  "target": "tap.py"
+}

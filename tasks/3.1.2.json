@@ -1,0 +1,6 @@
+{
+  "id": "3.1.2",
+  "type": "IMPLEMENT",
+  "desc": "Implement Config loading/validation logic in main.py.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/main.py"
+}

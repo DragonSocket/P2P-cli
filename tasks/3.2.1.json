@@ -1,0 +1,6 @@
+{
+  "id": "3.2.1",
+  "type": "RED",
+  "desc": "Create IPC server unit tests in tests/p2pvpn_daemon/ipc/test_server.py using a Mock client.",
+  "target": "tests/p2pvpn_daemon/ipc/test_server.py"
+}

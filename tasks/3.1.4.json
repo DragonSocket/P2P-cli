@@ -1,0 +1,6 @@
+{
+  "id": "3.1.4",
+  "type": "IMPLEMENT",
+  "desc": "Implement Loop execution and Signal Handling in main.py.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/main.py"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "2.1.3",
+  "type": "GREEN-WIN",
+  "desc": "Implement WindowsSystemConfigurator (netsh, powershell).",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/windows_config.py"
+}

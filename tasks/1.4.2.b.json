@@ -1,0 +1,6 @@
+{
+  "id": "1.4.2.b",
+  "type": "SYNC",
+  "desc": "Register p2pvpn_common in workspace (uv add --editable packages/p2pvpn_common).",
+  "target": "project_root"
+}

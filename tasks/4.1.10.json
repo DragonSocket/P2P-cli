@@ -1,0 +1,6 @@
+{
+  "id": "4.1.10",
+  "type": "VERIFY",
+  "desc": "Run stop command tests.",
+  "target": "tests/p2pvpn_cli/test_cli.py"
+}

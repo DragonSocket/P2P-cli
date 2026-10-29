@@ -1,0 +1,6 @@
+{
+  "id": "3.2.6",
+  "type": "VERIFY",
+  "desc": "Run IPC integration tests (from 3.2.4).",
+  "target": "tests/p2pvpn_daemon/ipc/test_integration.py"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "1.4.2",
+  "type": "GREEN",
+  "desc": "Move all protocol/node constants from vpn_node.py to p2pvpn_common/constants.py.",
+  "target": "packages/p2pvpn_common/p2pvpn_common/constants.py"
+}

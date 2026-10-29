@@ -1,0 +1,6 @@
+{
+  "id": "1.3.3",
+  "type": "VERIFY",
+  "desc": "Run pytest tests/p2pvpn_common/models/test_models.py.",
+  "target": "tests/p2pvpn_common/models/test_models.py"
+}

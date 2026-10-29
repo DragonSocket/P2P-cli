@@ -1,0 +1,6 @@
+{
+  "id": "2.4.1",
+  "type": "RED",
+  "desc": "Create PeerManager unit tests in tests/p2pvpn_daemon/core/test_peer_manager.py.",
+  "target": "tests/p2pvpn_daemon/core/test_peer_manager.py"
+}

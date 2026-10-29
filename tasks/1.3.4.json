@@ -1,0 +1,6 @@
+{
+  "id": "1.3.4",
+  "type": "CLEANUP",
+  "desc": "Update all imports in vpn_node.py to point to new models.",
+  "target": "project_root"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "1.1.2.1",
+  "type": "GREEN",
+  "desc": "Implement STUN parsing logic (packet parsing/decoding) in p2pvpn_common/protocol/stun.py.",
+  "target": "packages/p2pvpn_common/p2pvpn_common/protocol/stun.py"
+}

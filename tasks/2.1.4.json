@@ -1,0 +1,6 @@
+{
+  "id": "2.1.4",
+  "type": "VERIFY",
+  "desc": "Run integration tests verifying Configurator command calls via mocks.",
+  "target": "tests/p2pvpn_daemon/interface/test_config.py"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "2.4.4",
+  "type": "VERIFY",
+  "desc": "Run PeerManager $\\leftrightarrow$ Engine integration tests.",
+  "target": "tests/p2pvpn_daemon/core/test_peer_manager_engine.py"
+}

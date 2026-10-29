@@ -1,0 +1,6 @@
+{
+  "id": "2.4.3",
+  "type": "DI",
+  "desc": "Inject PeerManager into VPNEngine.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/core/engine.py"
+}

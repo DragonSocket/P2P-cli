@@ -1,0 +1,6 @@
+{
+  "id": "4.1.1",
+  "type": "INFRA",
+  "desc": "Implement Mock IPC client and test fixtures in conftest.py.",
+  "target": "tests/p2pvpn_cli/conftest.py"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "2.5.2",
+  "type": "GREEN",
+  "desc": "Implement VPNEngine orchestration loop (asyncio) using DI.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/core/engine.py"
+}

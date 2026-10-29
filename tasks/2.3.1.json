@@ -1,0 +1,6 @@
+{
+  "id": "2.3.1",
+  "type": "RED",
+  "desc": "Create BaseTransport (ABC) and failing tests in tests/p2pvpn_daemon/transport/test_base.py.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/transport/base.py"
+}

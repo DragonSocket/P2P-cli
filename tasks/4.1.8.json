@@ -1,0 +1,6 @@
+{
+  "id": "4.1.8",
+  "type": "RED",
+  "desc": "Create unit tests for stop command.",
+  "target": "tests/p2pvpn_cli/test_cli.py"
+}

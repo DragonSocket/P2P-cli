@@ -1,0 +1,6 @@
+{
+  "id": "4.1.2",
+  "type": "RED",
+  "desc": "Create unit tests for status command.",
+  "target": "tests/p2pvpn_cli/test_cli.py"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "2.2.5",
+  "type": "GREEN",
+  "desc": "Implement TAPDevice factory in interface/factory.py.",
+  "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/factory.py"
+}

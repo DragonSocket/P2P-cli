@@ -1,0 +1,6 @@
+{
+  "id": "3.2.3",
+  "type": "VERIFY",
+  "desc": "Run IPC server unit tests (from 3.2.1).",
+  "target": "tests/p2pvpn_daemon/ipc/test_server.py"
+}

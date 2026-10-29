@@ -1,0 +1,6 @@
+{
+  "id": "3.2.4",
+  "type": "RED",
+  "desc": "Create IPC integration tests in tests/p2pvpn_daemon/ipc/test_integration.py (Client $\\leftrightarrow$ Engine).",
+  "target": "tests/p2pvpn_daemon/ipc/test_integration.py"
+}

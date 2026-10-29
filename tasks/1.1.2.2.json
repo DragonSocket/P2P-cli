@@ -1,0 +1,6 @@
+{
+  "id": "1.1.2.2",
+  "type": "GREEN",
+  "desc": "Implement STUN async socket/client logic in p2pvpn_common/protocol/stun.py.",
+  "target": "packages/p2pvpn_common/p2pvpn_common/protocol/stun.py"
+}
