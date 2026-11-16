@@ -1,0 +1,12 @@
+[project]
+name = "p2pvpn-common"
+version = "0.2.0"
+description = "Shared models, protocol and constants for P2P L2 VPN"
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["p2pvpn_common*"]

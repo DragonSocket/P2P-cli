@@ -111,13 +111,33 @@ python main.py --ip 10.0.0.1 --port 5555 --peer <peer_pub_ip>:5555 --tap tap0
 ### Участник A (публичный IP: 1.2.3.4)
 
 ```bash
-sudo python3 main.py --ip 10.0.0.1 --port 5555 --peer 5.6.7.8:5555
+sudo uv run p2pvpn-cli connect --config node_a.json
 ```
 
 ### Участник B (публичный IP: 5.6.7.8)
 
 ```bash
-sudo python3 main.py --ip 10.0.0.2 --port 5555 --peer 1.2.3.4:5555
+sudo uv run p2pvpn-cli connect --config node_b.json
+```
+
+### Управление и диагностика (без root)
+
+Пока daemon работает, CLI обращается к нему через IPC
+(Linux: UDS `/tmp/p2pvpn.sock`, Windows: TCP `127.0.0.1:5678`):
+
+```bash
+uv run p2pvpn-cli status          # статус узла и таблица пиров
+uv run p2pvpn-cli add-peer 5.6.7.8:5555
+uv run p2pvpn-cli remove-peer 5.6.7.8:5555
+uv run p2pvpn-cli stop            # graceful shutdown daemon
+uv run p2pvpn-cli demo -d 5       # демо без root/сети/TAP: in-memory TAP + fake-транспорт
+```
+
+Legacy-шимы (`main.py`, `vpn_node.py`, `tap.py`, `stun_client.py`) продолжают
+работать, но депрецированы:
+
+```bash
+sudo python3 main.py --ip 10.0.0.1 --port 5555 --peer 5.6.7.8:5555  # = старая точка входа
 ```
 
 ### Проверка связи
@@ -240,14 +260,19 @@ TYPE = 0x02  HELLO  — keepalive / анонс присутствия
 
 ```
 p2pvpn/
-├── main.py            — CLI и точка входа
-├── vpn_node.py        — логика VPN (UDP, peer table, hole punching)
-├── tap.py             — кросс-платформенный TAP: Linux (/dev/net/tun)
-│                        и Windows (TAP-Windows6 через pywin32)
-├── stun_client.py     — STUN-клиент для определения публичного адреса
-├── windows-run.bat    — установка и запуск на Windows одной командой
-├── node_a.json        — пример конфига для участника A
-└── node_b.json        — пример конфига для участника B
+├── packages/
+│   ├── p2pvpn_common/     — контракты: constants, models (VPNConfig, Peer),
+│   │                        protocol (packet, ipc, stun), utils
+│   ├── p2pvpn_daemon/     — Model: VPNEngine + PeerManager + Heartbeat + HolePunch,
+│   │                        Transport (UDP) / L2Interface (TAP) / Configurator (ABC),
+│   │                        IPC-сервер (UDS/TCP), testing/ (fake-коллабораторы)
+│   └── p2pvpn_cli/        — View: connect/status/add-peer/stop/demo, rich-рендер
+├── tests/                 — common / daemon / cli (37 тестов)
+├── main.py, vpn_node.py, tap.py, stun_client.py — депрецированные шимы
+├── windows-run.bat        — установка TAP + запуск на Windows одной командой
+├── node_a.json, node_b.json — примеры конфигов
+├── ARCHITECTURE.md        — целевая SOLID/MVC-архитектура
+└── TASKS.md               — трекер progress
 ```
 
 ## Известные ограничения и что можно улучшить

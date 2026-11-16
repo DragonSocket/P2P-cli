@@ -1,0 +1,24 @@
+[project]
+name = "p2pvpn-cli"
+version = "0.2.0"
+description = "P2P L2 VPN CLI (view layer)"
+requires-python = ">=3.10"
+dependencies = [
+    "p2pvpn-common",
+    "p2pvpn-daemon",
+    "rich>=13.0",
+]
+
+[project.scripts]
+p2pvpn-cli = "p2pvpn_cli.main:main"
+
+[tool.uv.sources]
+p2pvpn-common = { path = "../p2pvpn_common", editable = true }
+p2pvpn-daemon = { path = "../p2pvpn_daemon", editable = true }
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["p2pvpn_cli*"]

@@ -12,6 +12,12 @@ REM    5) запускает main.py со всеми переданными ар
 REM
 REM  Пример:
 REM    windows-run.bat --ip 10.0.0.1 --port 5555 --peer 1.2.3.4:5555
+REM    windows-run.bat --config node_a.json
+REM    windows-run.bat --fake                 — демо без TAP (in-memory)
+REM
+REM  Новая точка входа (после `uv sync`):
+REM    uv run p2pvpn-cli connect --config node_a.json
+REM    uv run p2pvpn-cli status / add-peer / stop / demo
 REM
 REM  Переменные окружения (опциональные):
 REM    set TAPCTL=C:\path\to\tapctl.exe       — явно указать путь

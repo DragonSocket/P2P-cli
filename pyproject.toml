@@ -1,0 +1,30 @@
+[project]
+name = "p2pvpn"
+version = "0.2.0"
+description = "P2P L2 VPN over UDP (SOLID/MVC refactor)"
+requires-python = ">=3.10"
+dependencies = [
+    "p2pvpn-common",
+    "p2pvpn-daemon",
+    "p2pvpn-cli",
+    "rich>=13.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.uv.sources]
+p2pvpn-common = { path = "packages/p2pvpn_common", editable = true }
+p2pvpn-daemon = { path = "packages/p2pvpn_daemon", editable = true }
+p2pvpn-cli = { path = "packages/p2pvpn_cli", editable = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = [
+    "packages/p2pvpn_common",
+    "packages/p2pvpn_daemon",
+    "packages/p2pvpn_cli",
+]
