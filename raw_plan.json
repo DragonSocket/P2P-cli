@@ -1,0 +1,412 @@
+{
+  "stage_1_common_library": {
+    "1.4_extract_constants": [
+      {
+        "id": "1.4.1",
+        "type": "RED",
+        "desc": "Create tests in tests/p2pvpn_common/test_constants.py.",
+        "target": "tests/p2pvpn_common/test_constants.py"
+      },
+      {
+        "id": "1.4.2",
+        "type": "GREEN",
+        "desc": "Move all protocol/node constants from vpn_node.py to p2pvpn_common/constants.py.",
+        "target": "packages/p2pvpn_common/p2pvpn_common/constants.py"
+      },
+      {
+        "id": "1.4.2.b",
+        "type": "SYNC",
+        "desc": "Register p2pvpn_common in workspace (uv add --editable packages/p2pvpn_common).",
+        "target": "project_root"
+      },
+      {
+        "id": "1.4.3",
+        "type": "VERIFY",
+        "desc": "Run pytest tests/p2pvpn_common/test_constants.py.",
+        "target": "tests/p2pvpn_common/test_constants.py"
+      },
+      {
+        "id": "1.4.4",
+        "type": "CLEANUP",
+        "desc": "Update imports and migrate constant usage in vpn_node.py.",
+        "target": "project_root"
+      }
+    ],
+    "1.3_extract_models": [
+      {
+        "id": "1.3.1",
+        "type": "RED",
+        "desc": "Create tests for Peer and VPNConfig models (using dataclass interface).",
+        "target": "tests/p2pvpn_common/models/test_models.py"
+      },
+      {
+        "id": "1.3.2.1",
+        "type": "GREEN",
+        "desc": "Implement Peer class and satisfy tests from 1.3.1.",
+        "target": "packages/p2pvpn_common/p2pvpn_common/models/peer.py"
+      },
+      {
+        "id": "1.3.2.2",
+        "type": "GREEN",
+        "desc": "Implement VPNConfig and PeerConfig and satisfy tests from 1.3.1.",
+        "target": "packages/p2pvpn_common/p2pvpn_common/models/vpn_config.py"
+      },
+      {
+        "id": "1.3.3",
+        "type": "VERIFY",
+        "desc": "Run pytest tests/p2pvpn_common/models/test_models.py.",
+        "target": "tests/p2pvpn_common/models/test_models.py"
+      },
+      {
+        "id": "1.3.4",
+        "type": "CLEANUP",
+        "desc": "Update all imports in vpn_node.py to point to new models.",
+        "target": "project_root"
+      },
+      {
+        "id": "1.3.5",
+        "type": "REFACTOR",
+        "desc": "Update vpn_node.py call-sites from dict['key'] to object.key.",
+        "target": "project_root"
+      }
+    ],
+    "1.2_extract_protocol": [
+      {
+        "id": "1.2.1",
+        "type": "RED",
+        "desc": "Create tests in tests/p2pvpn_common/protocol/test_packet.py using new import path.",
+        "target": "tests/p2pvpn_common/protocol/test_packet.py"
+      },
+      {
+        "id": "1.2.2",
+        "type": "GREEN",
+        "desc": "Implement p2pvpn_common/protocol/packet.py using constants from p2pvpn_common.constants.",
+        "target": "packages/p2pvpn_common/p2pvpn_common/protocol/packet.py"
+      },
+      {
+        "id": "1.2.3",
+        "type": "VERIFY",
+        "desc": "Run pytest tests/p2pvpn_common/protocol/test_packet.py.",
+        "target": "tests/p2pvpn_common/protocol/test_packet.py"
+      },
+      {
+        "id": "1.2.4",
+        "type": "CLEANUP",
+        "desc": "Update imports in vpn_node.py.",
+        "target": "project_root"
+      }
+    ],
+    "1.1_extract_stun": [
+      {
+        "id": "1.1.1",
+        "type": "RED",
+        "desc": "Create tests in tests/p2pvpn_common/protocol/test_stun.py using new import path. Expected: ModuleNotFoundError.",
+        "target": "tests/p2pvpn_common/protocol/test_stun.py"
+      },
+      {
+        "id": "1.1.2.1",
+        "type": "GREEN",
+        "desc": "Implement STUN parsing logic (packet parsing/decoding) in p2pvpn_common/protocol/stun.py.",
+        "target": "packages/p2pvpn_common/p2pvpn_common/protocol/stun.py"
+      },
+      {
+        "id": "1.1.2.2",
+        "type": "GREEN",
+        "desc": "Implement STUN async socket/client logic in p2pvpn_common/protocol/stun.py.",
+        "target": "packages/p2pvpn_common/p2pvpn_common/protocol/stun.py"
+      },
+      {
+        "id": "1.1.3",
+        "type": "VERIFY",
+        "desc": "Run pytest tests/p2pvpn_common/protocol/test_stun.py.",
+        "target": "tests/p2pvpn_common/protocol/test_stun.py"
+      },
+      {
+        "id": "1.1.4",
+        "type": "CLEANUP",
+        "desc": "Update imports in main.py and vpn_node.py.",
+        "target": "project_root"
+      }
+    ]
+  },
+  "stage_2_daemon_core": {
+    "2.1_system_configurator": [
+      {
+        "id": "2.1.1",
+        "type": "RED",
+        "desc": "Create BaseSystemConfigurator (ABC) and failing tests mocking os behavior.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/base_config.py"
+      },
+      {
+        "id": "2.1.2",
+        "type": "GREEN-LINUX",
+        "desc": "Implement LinuxSystemConfigurator (iptables, ethtool, ip link).",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/linux_config.py"
+      },
+      {
+        "id": "2.1.3",
+        "type": "GREEN-WIN",
+        "desc": "Implement WindowsSystemConfigurator (netsh, powershell).",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/windows_config.py"
+      },
+      {
+        "id": "2.1.4",
+        "type": "VERIFY",
+        "desc": "Run integration tests verifying Configurator command calls via mocks.",
+        "target": "tests/p2pvpn_daemon/interface/test_config.py"
+      }
+    ],
+    "2.2_interface_abstraction": [
+      {
+        "id": "2.2.1",
+        "type": "RED",
+        "desc": "Create BaseTAPInterface (ABC) and failing tests in tests/p2pvpn_daemon/interface/test_base.py.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/base.py"
+      },
+      {
+        "id": "2.2.2",
+        "type": "GREEN-LINUX",
+        "desc": "Implement LinuxTAP(BaseTAPInterface) with SystemConfigurator injected.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/linux_tap.py"
+      },
+      {
+        "id": "2.2.3",
+        "type": "GREEN-WIN",
+        "desc": "Implement WindowsTAP(BaseTAPInterface) with SystemConfigurator injected.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/windows_tap.py"
+      },
+      {
+        "id": "2.2.4",
+        "type": "RED",
+        "desc": "Create TAPDevice factory tests in tests/p2pvpn_daemon/interface/test_factory.py.",
+        "target": "tests/p2pvpn_daemon/interface/test_factory.py"
+      },
+      {
+        "id": "2.2.5",
+        "type": "GREEN",
+        "desc": "Implement TAPDevice factory in interface/factory.py.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/interface/factory.py"
+      },
+      {
+        "id": "2.2.6",
+        "type": "SHIM",
+        "desc": "Implement root tap.py as a thin wrapper around the new factory.",
+        "target": "tap.py"
+      },
+      {
+        "id": "2.2.7",
+        "type": "VERIFY",
+        "desc": "Run full TAP integration tests (Interface + Configurator).",
+        "target": "tests/p2pvpn_daemon/interface/test_tap.py"
+      }
+    ],
+    "2.3_transport_layer": [
+      {
+        "id": "2.3.1",
+        "type": "RED",
+        "desc": "Create BaseTransport (ABC) and failing tests in tests/p2pvpn_daemon/transport/test_base.py.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/transport/base.py"
+      },
+      {
+        "id": "2.3.2",
+        "type": "GREEN",
+        "desc": "Implement UDPTransport(BaseTransport) with asyncio.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/transport/udp/udp_transport.py"
+      },
+      {
+        "id": "2.3.3",
+        "type": "VERIFY",
+        "desc": "Run transport integration tests (UDP connectivity).",
+        "target": "tests/p2pvpn_daemon/transport/udp/test_udp_transport.py"
+      }
+    ],
+    "2.4_peer_manager": [
+      {
+        "id": "2.4.1",
+        "type": "RED",
+        "desc": "Create PeerManager unit tests in tests/p2pvpn_daemon/core/test_peer_manager.py.",
+        "target": "tests/p2pvpn_daemon/core/test_peer_manager.py"
+      },
+      {
+        "id": "2.4.2",
+        "type": "GREEN",
+        "desc": "Implement PeerManager with two-threshold state logic.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/core/peer_manager.py"
+      },
+      {
+        "id": "2.4.3",
+        "type": "DI",
+        "desc": "Inject PeerManager into VPNEngine.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/core/engine.py"
+      },
+      {
+        "id": "2.4.4",
+        "type": "VERIFY",
+        "desc": "Run PeerManager $\\leftrightarrow$ Engine integration tests.",
+        "target": "tests/p2pvpn_daemon/core/test_peer_manager_engine.py"
+      }
+    ],
+    "2.5_engine_orchestration": [
+      {
+        "id": "2.5.1",
+        "type": "RED",
+        "desc": "Create VPNEngine unit tests using Mock TAP, Mock Transport, and Mock PeerManager.",
+        "target": "tests/p2pvpn_daemon/core/test_engine.py"
+      },
+      {
+        "id": "2.5.2",
+        "type": "GREEN",
+        "desc": "Implement VPNEngine orchestration loop (asyncio) using DI.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/core/engine.py"
+      },
+      {
+        "id": "2.5.3",
+        "type": "VERIFY",
+        "desc": "Run full Engine orchestration integration test (Mock TAP $\\leftrightarrow$ Mock Transport).",
+        "target": "tests/p2pvpn_daemon/core/test_engine.py"
+      }
+    ]
+  },
+  "stage_3_daemon_service": {
+    "3.1_daemon_entry": [
+      {
+        "id": "3.1.1",
+        "type": "RED",
+        "desc": "Write daemon lifecycle integration tests in tests/p2pvpn_daemon/integration/test_daemon_lifecycle.py. (Must fail due to missing main.py).",
+        "target": "tests/p2pvpn_daemon/integration/test_daemon_lifecycle.py"
+      },
+      {
+        "id": "3.1.2",
+        "type": "IMPLEMENT",
+        "desc": "Implement Config loading/validation logic in main.py.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/main.py"
+      },
+      {
+        "id": "3.1.3",
+        "type": "IMPLEMENT",
+        "desc": "Implement Component Assembly (DI) in main.py.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/main.py"
+      },
+      {
+        "id": "3.1.4",
+        "type": "IMPLEMENT",
+        "desc": "Implement Loop execution and Signal Handling in main.py.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/main.py"
+      },
+      {
+        "id": "3.1.5",
+        "type": "VERIFY",
+        "desc": "Run daemon startup/shutdown integration tests (from 3.1.1).",
+        "target": "tests/p2pvpn_daemon/integration/test_daemon_lifecycle.py"
+      }
+    ],
+    "3.2_ipc_communication": [
+      {
+        "id": "3.2.1",
+        "type": "RED",
+        "desc": "Create IPC server unit tests in tests/p2pvpn_daemon/ipc/test_server.py using a Mock client.",
+        "target": "tests/p2pvpn_daemon/ipc/test_server.py"
+      },
+      {
+        "id": "3.2.2",
+        "type": "GREEN",
+        "desc": "Implement IPC server (Unix socket / TCP loopback) in server.py.",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/ipc/server.py"
+      },
+      {
+        "id": "3.2.3",
+        "type": "VERIFY",
+        "desc": "Run IPC server unit tests (from 3.2.1).",
+        "target": "tests/p2pvpn_daemon/ipc/test_server.py"
+      },
+      {
+        "id": "3.2.4",
+        "type": "RED",
+        "desc": "Create IPC integration tests in tests/p2pvpn_daemon/ipc/test_integration.py (Client $\\leftrightarrow$ Engine).",
+        "target": "tests/p2pvpn_daemon/ipc/test_integration.py"
+      },
+      {
+        "id": "3.2.5",
+        "type": "GREEN",
+        "desc": "Implement IPCController in controller.py (bridge to VPNEngine).",
+        "target": "packages/p2pvpn_daemon/p2pvpn_daemon/ipc/controller.py"
+      },
+      {
+        "id": "3.2.6",
+        "type": "VERIFY",
+        "desc": "Run IPC integration tests (from 3.2.4).",
+        "target": "tests/p2pvpn_daemon/ipc/test_integration.py"
+      }
+    ]
+  },
+  "stage_4_cli_tool": {
+    "4.1_cli_implementation": [
+      {
+        "id": "4.1.1",
+        "type": "INFRA",
+        "desc": "Implement Mock IPC client and test fixtures in conftest.py.",
+        "target": "tests/p2pvpn_cli/conftest.py"
+      },
+      {
+        "id": "4.1.2",
+        "type": "RED",
+        "desc": "Create unit tests for status command.",
+        "target": "tests/p2pvpn_cli/test_cli.py"
+      },
+      {
+        "id": "4.1.3",
+        "type": "GREEN",
+        "desc": "Implement CLI status command.",
+        "target": "packages/p2pvpn_cli/p2pvpn_cli/main.py"
+      },
+      {
+        "id": "4.1.4",
+        "type": "VERIFY",
+        "desc": "Run status command tests.",
+        "target": "tests/p2pvpn_cli/test_cli.py"
+      },
+      {
+        "id": "4.1.5",
+        "type": "RED",
+        "desc": "Create unit tests for add-peer command.",
+        "target": "tests/p2pvpn_cli/test_cli.py"
+      },
+      {
+        "id": "4.1.6",
+        "type": "GREEN",
+        "desc": "Implement CLI add-peer command.",
+        "target": "packages/p2pvpn_cli/p2pvpn_cli/main.py"
+      },
+      {
+        "id": "4.1.7",
+        "type": "VERIFY",
+        "desc": "Run add-peer command tests.",
+        "target": "tests/p2pvpn_cli/test_cli.py"
+      },
+      {
+        "id": "4.1.8",
+        "type": "RED",
+        "desc": "Create unit tests for stop command.",
+        "target": "tests/p2pvpn_cli/test_cli.py"
+      },
+      {
+        "id": "4.1.9",
+        "type": "GREEN",
+        "desc": "Implement CLI stop command.",
+        "target": "packages/p2pvpn_cli/p2pvpn_cli/main.py"
+      },
+      {
+        "id": "4.1.10",
+        "type": "VERIFY",
+        "desc": "Run stop command tests.",
+        "target": "tests/p2pvpn_cli/test_cli.py"
+      },
+      {
+        "id": "4.1.11",
+        "type": "INTEGRATION",
+        "desc": "Run E2E CLI tests (CLI $\\leftrightarrow$ Dummy IPC server).",
+        "target": "tests/p2pvpn_cli/test_e2e_cli.py"
+      }
+    ]
+  }
+}

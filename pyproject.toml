@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "p2pvpn"
+version = "0.2.0"
+description = "Linux virtual LAN with DHT discovery and a local control API"
+requires-python = ">=3.11"
+dependencies = ["kademlia>=2.2.3,<3", "cryptography>=44"]
+
+[project.scripts]
+p2pvpn = "p2pvpn.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["p2pvpn*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]

@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: p2pvpn
+Version: 0.2.0
+Summary: Linux virtual LAN with DHT discovery and a local control API
+Requires-Python: >=3.11
+Requires-Dist: kademlia<3,>=2.2.3
+Requires-Dist: cryptography>=44

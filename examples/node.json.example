@@ -1,0 +1,16 @@
+{
+  "name": "alice",
+  "swarm": "friends",
+  "key": "REPLACE_WITH_SHARED_KEY_FROM_P2PVPN_INIT",
+  "address": "10.77.0.1/24",
+  "advertise": "192.0.2.10:5555",
+  "listen": "0.0.0.0:5555",
+  "dht_listen": "0.0.0.0:5556",
+  "bootstrap": [],
+  "peers": ["bob"],
+  "interface": "p2p0",
+  "mtu": 1200,
+  "socket": "/run/p2pvpn/control.sock",
+  "log_level": "INFO",
+  "headless": false
+}

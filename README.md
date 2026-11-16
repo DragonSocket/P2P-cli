@@ -1,306 +1,168 @@
-# P2P L2 VPN
+# P2P CLI — Linux virtual LAN
 
-Минималистичный peer-to-peer VPN уровня L2 (Ethernet) на чистом Python 3.
-Создаёт виртуальный TAP-интерфейс и туннелирует сырые Ethernet-фреймы по UDP между участниками.
+Переработка ветки `attempt2`: переиспользуемое Python-ядро, отдельный демон,
+локальный JSON API и CLI/терминальный монитор. Python 3.11+, Linux, `iproute2`.
+Старый Windows/Linux прототип сохранён в `legacy/`; его wire protocol несовместим с v2.
 
-## Как это работает
+## Возможности
 
-```
-  Игра → tap0 (виртуальная сетевая карта) → VPN-процесс → UDP → интернет → VPN-процесс → tap0 → Игра
-```
+- TAP переносит Ethernet, ARP, IPv4 broadcast и multicast между участниками.
+  Приложения подключаются по виртуальным IP обычными TCP/UDP-сокетами.
+- Обучаемая MAC-таблица направляет известный unicast конкретному пиру;
+  broadcast и неизвестный unicast получают все живые соседи.
+- Приватная Kademlia DHT хранит реплицированные записи `имя → виртуальный IP + UDP endpoint`.
+  Записи живут 120 секунд, узел обновляет их каждые 15 секунд.
+- Рой изолирован именем и общим случайным ключом. Трафик и DHT RPC защищены
+  ChaCha20-Poly1305; повторные и слишком старые сетевые пакеты отбрасываются.
+- Heartbeat, ограниченные таблицы/пакеты, graceful shutdown, singleton-lock,
+  ошибки фоновых задач приводят к завершению сервиса, а не тихой потере функциональности.
+- DEBUG / INFO / WARNING / ERROR / CRITICAL; stderr/journal и необязательный
+  файл с ротацией 10 MiB × 5 архивов.
 
-- Используется **TAP** (не TUN): туннелируются Ethernet-фреймы (L2), поэтому broadcast, ARP и обнаружение по сети работают «из коробки».
-- Каждый узел слушает UDP-порт и пересылает фреймы всем известным пирам (**broadcast на уровне приложения**).
-- Новые участники обнаруживаются автоматически (peer discovery через HELLO-пакеты).
-- Мёртвые пиры (нет пакетов > 15 сек) удаляются из таблицы.
-
-## Требования
-
-- **Linux** (нужен `/dev/net/tun`) или **Windows 10/11** (TAP-Windows6)
-- Python 3.10+
-- Root / Administrator (для создания TAP-интерфейса)
-- Открытый UDP-порт (по умолчанию 5555) на файрволе
-
-## Установка на ArchLinux
+## Установка
 
 ```bash
-# Всё что нужно — уже в base (python, iproute2, iptables/nftables).
-# Дополнительно для тестирования broadcast / проверки связи:
-sudo pacman -S --needed python iproute2 iptables ethtool nmap
-
-# Модуль tun обычно уже загружен, на всякий случай:
-sudo modprobe tun
-ls /dev/net/tun   # должен существовать
-
-# Клонируем и запускаем (root нужен для TAP + iptables):
-git clone <repo> p2pvpn && cd p2pvpn
-sudo python3 main.py --ip 10.0.0.1 --port 5555 --peer <peer_ip>:5555
+python3 -m venv .venv
+.venv/bin/pip install -e .
+.venv/bin/p2pvpn --help
 ```
 
-Если используется firewalld вместо iptables — см. раздел «Файрвол» ниже.
-`nmap` даёт команду `ncat`, используемую в примерах проверки broadcast.
+Или `uv venv .venv && uv pip install --python .venv/bin/python -e .`.
 
-## Установка на Windows
+## Два компьютера
 
-Все шаги (драйвер-проверка, создание TAP-адаптера, pywin32, firewall,
-запуск) автоматизированы в `windows-run.bat`.
+Пример: A имеет доступный адрес `192.0.2.10`, B — `198.51.100.20`.
+Это адреса документации: **замените их реальными доступными IPv4**.
+Выберите свободную виртуальную подсеть, которая не пересекается с LAN/VPN.
 
-**Одноразово**: поставить драйвер TAP-Windows6 — любой источник:
-
-| Источник | Что даёт | Где взять |
-|---|---|---|
-| **OpenVPN Community** (рекомендуется) | tapctl.exe + tapinstall.exe + драйвер | https://openvpn.net/community-downloads/ |
-| **TAP-Windows6 standalone** | tapinstall.exe + драйвер | https://build.openvpn.net/downloads/releases/ (`tap-windows-9.x.y-…exe`) |
-| **WireGuard for Windows** | по умолчанию использует Wintun, **tapctl обычно не идёт** — не подходит, ставь OpenVPN |
-
-Python 3.10+ должен быть в `PATH`.
-
-**Запуск** (двойной клик / cmd / PowerShell):
-
-```bat
-windows-run.bat --ip 10.0.0.1 --port 5555 --peer 94.180.149.23:5555
-```
-
-Что делает скрипт:
-
-1. Перезапускается от Администратора (UAC-промпт).
-2. `pip install pywin32` — если ещё не стоит.
-3. Ищет уже созданный TAP-Windows6 адаптер через `Get-NetAdapter`.
-4. Если адаптера нет — создаёт его:
-   - сначала пробует `tapctl.exe` (OpenVPN Community / OpenVPN Connect / WireGuard);
-   - если не нашёл — `tapinstall.exe` + `OemVista.inf` (стандалон-драйвер
-     или старый OpenVPN без tapctl).
-5. Если найденный адаптер называется не `tap0` — переименовывает через
-   `Rename-NetAdapter`.
-6. Добавляет правило брандмауэра «P2P L2 VPN» — UDP 5555 inbound
-   (идемпотентно, не дублирует).
-7. Запускает `python main.py` с теми аргументами, что ты передал bat-у.
-
-**Если `tapctl/tapinstall` лежит в нестандартном месте** — задай
-переменные окружения перед запуском:
-
-```bat
-set TAPCTL=D:\Tools\OpenVPN\bin\tapctl.exe
-windows-run.bat --ip 10.0.0.1 --peer 1.2.3.4:5555
-
-REM или связкой:
-set TAPINSTALL=D:\Tools\TAP-Windows\bin\tapinstall.exe
-set TAPINF=D:\Tools\TAP-Windows\driver\OemVista.inf
-windows-run.bat ...
-```
-
-### Если всё-таки хочется руками
-
-```powershell
-# PowerShell от имени Администратора:
-& "C:\Program Files\OpenVPN\bin\tapctl.exe" create --name tap0 --hwid tap0901
-# или (если есть только tapinstall):
-& "C:\Program Files\TAP-Windows\bin\tapinstall.exe" install `
-    "C:\Program Files\TAP-Windows\driver\OemVista.inf" tap0901
-Get-NetAdapter | Where-Object InterfaceDescription -like 'TAP-Windows*' |
-    Rename-NetAdapter -NewName tap0
-
-python -m pip install pywin32
-New-NetFirewallRule -DisplayName "P2P L2 VPN" -Direction Inbound `
-    -Protocol UDP -LocalPort 5555 -Action Allow
-python main.py --ip 10.0.0.1 --port 5555 --peer <peer_pub_ip>:5555 --tap tap0
-```
-
-## Быстрый старт (2 участника)
-
-### Участник A (публичный IP: 1.2.3.4)
+На A:
 
 ```bash
-sudo python3 main.py --ip 10.0.0.1 --port 5555 --peer 5.6.7.8:5555
+.venv/bin/p2pvpn init --config alice.json --name alice \
+  --address 10.77.0.1/24 --advertise 192.0.2.10:5555
 ```
 
-### Участник B (публичный IP: 5.6.7.8)
-
-```bash
-sudo python3 main.py --ip 10.0.0.2 --port 5555 --peer 1.2.3.4:5555
-```
-
-### Проверка связи
-
-```bash
-ping 10.0.0.2        # A пингует B
-ping 10.0.0.1        # B пингует A
-```
-
-### Проверка broadcast через ncat
-
-Поскольку туннель работает на уровне L2, broadcast-фреймы Ethernet
-(`ff:ff:ff:ff:ff:ff`) и IPv4-broadcast (`10.0.0.255`) прозрачно доходят
-до всех пиров — как в обычном LAN.
-
-**Unicast (точка-точка)**
-
-```bash
-# на B — слушаем UDP 4444:
-ncat -u -l -p 4444
-
-# на A — подключаемся по VPN-адресу B:
-ncat -u 10.0.0.2 4444
-# всё что набираешь на A, появляется у B
-```
-
-**Broadcast (всем сразу)**
-
-```bash
-# на B (и на всех остальных участниках) — слушаем broadcast:
-ncat -u -l -p 4444 --broadcast
-
-# на A — отправляем на subnet-broadcast:
-ncat -u --broadcast 10.0.0.255 4444
-# сообщение получат все участники, которые слушают 4444/udp
-```
-
-**TCP между клиентами (для игр / ncat chat)**
-
-```bash
-# B — TCP-listener:
-ncat -l -p 5000
-
-# A — TCP-клиент по VPN:
-ncat 10.0.0.2 5000
-```
-
-**ARP / обнаружение соседей**
-
-```bash
-# с любого узла:
-arping -I tap0 10.0.0.2       # увидим MAC пира
-ip neigh show dev tap0        # ARP-кэш VPN-интерфейса
-```
-
-## Через JSON-конфиг
-
-Отредактируй `node_a.json` / `node_b.json`, замени `PEER_X_PUBLIC_IP` на реальные адреса:
-
-```bash
-sudo python3 main.py --config node_a.json
-```
-
-## N участников
-
-Просто добавляй `--peer` несколько раз или список в JSON:
-
-```bash
-sudo python3 main.py --ip 10.0.0.3 --port 5555 \
-  --peer 1.2.3.4:5555 \
-  --peer 5.6.7.8:5555 \
-  --peer 9.10.11.12:5555
-```
+На B создайте свой конфиг аналогично (`bob`, `10.77.0.2/24`, другой advertise).
+В конфиге B установите **тот же `key` и `swarm`, что на A**, и добавьте:
 
 ```json
-{
-  "local_ip": "10.0.0.3",
-  "listen_port": 5555,
-  "tap_name": "tap0",
-  "peers": [
-    { "host": "1.2.3.4",    "port": 5555 },
-    { "host": "5.6.7.8",    "port": 5555 },
-    { "host": "9.10.11.12", "port": 5555 }
-  ]
-}
+"bootstrap": ["192.0.2.10:5556"],
+"peers": ["alice"]
 ```
 
-## Файрвол (firewalld / iptables / nftables)
+`bootstrap` — адреса **DHT-порта**, `advertise` — адрес **порта данных**.
+По умолчанию это UDP 5556 и 5555 соответственно. На маршрутизаторах обоих
+компьютеров нужны пробросы этих UDP-портов и разрешение в firewall.
+DHT использует наблюдаемые адреса, поэтому для неё используйте проброс 5556→5556.
+Пиры должны иметь уникальные имена и виртуальные IP. Конфиги содержат секрет:
+`init` создаёт их с правами 0600. Не коммитьте их.
+
+Запустите на каждом компьютере (путь к конфигу может быть абсолютным):
 
 ```bash
-# iptables (ArchLinux по умолчанию)
-sudo iptables -I INPUT -p udp --dport 5555 -j ACCEPT
-
-# nftables
-sudo nft add rule inet filter input udp dport 5555 accept
-
-# firewalld
-sudo firewall-cmd --add-port=5555/udp --permanent
-sudo firewall-cmd --reload
+sudo .venv/bin/p2pvpn run --config alice.json
 ```
 
-Для ncat-тестов broadcast (порт 4444) — открой его на обеих машинах
-**на интерфейсе tap0**, а не на физическом:
+В другом терминале:
 
 ```bash
-sudo iptables -I INPUT -i tap0 -p udp --dport 4444 -j ACCEPT
-sudo iptables -I INPUT -i tap0 -p tcp --dport 5000 -j ACCEPT
+sudo .venv/bin/p2pvpn status
+sudo .venv/bin/p2pvpn resolve bob
+sudo .venv/bin/p2pvpn connect bob
+sudo .venv/bin/p2pvpn tui
+ping 10.77.0.2
+sudo .venv/bin/p2pvpn log-level DEBUG
+sudo .venv/bin/p2pvpn --json status
+sudo .venv/bin/p2pvpn stop
 ```
 
-## Формат пакета
+После первого соединения пиры обмениваются именами участников и находят их
+адреса через DHT. Подключение подтверждается heartbeat: `connect` запускает
+соединение, статус `alive` означает полученный ответ. `resolve` только ищет запись.
+Известное имя необходимо: глобального каталога всех пользователей нет.
 
-```
-[ MAGIC (5 байт) | TYPE (1 байт) | PAYLOAD ]
+TAP автоматически создаёт подключённый маршрут `10.77.0.0/24`;
+TCP/UDP-приложения могут работать с этими адресами без интеграции с ядром.
+Для игр выберите `p2p0`/виртуальный IP в настройках, если игра привязана к другой
+сетевой карте. Маршрут по умолчанию и firewall программа не меняет.
+Для TCP/UDP на TAP применяются обычные правила локального firewall.
 
-TYPE = 0x01  DATA   — сырой Ethernet-фрейм
-TYPE = 0x02  HELLO  — keepalive / анонс присутствия
-```
+## Демон systemd
 
-## Структура кода
-
-```
-p2pvpn/
-├── main.py            — CLI и точка входа
-├── vpn_node.py        — логика VPN (UDP, peer table, hole punching)
-├── tap.py             — кросс-платформенный TAP: Linux (/dev/net/tun)
-│                        и Windows (TAP-Windows6 через pywin32)
-├── stun_client.py     — STUN-клиент для определения публичного адреса
-├── windows-run.bat    — установка и запуск на Windows одной командой
-├── node_a.json        — пример конфига для участника A
-└── node_b.json        — пример конфига для участника B
-```
-
-## Известные ограничения и что можно улучшить
-
-| Что | Как расширить |
-|-----|---------------|
-| Нет шифрования | Добавить `cryptography` (Fernet/AES-GCM) |
-| Нет аутентификации | Pre-shared key или WireGuard-подобный handshake |
-| Broadcast → всем | Учитывать destination MAC для unicast/multicast |
-| UDP может теряться | Для надёжности добавить ACK для критичных пакетов |
-| Нет NAT-traversal | Уже работает через STUN + UDP hole punching (см. `stun_client.py`) |
-
-## Диагностика
+`run` работает на переднем плане; фон, рестарты и journal обеспечивает systemd.
+Файл [packaging/p2pvpn.service](packaging/p2pvpn.service) рассчитан на установку
+в `/opt/p2pvpn` и конфиг `/etc/p2pvpn/node.json`. Подготовьте эти пути и venv,
+затем установите unit:
 
 ```bash
-# Видно ли VPN-интерфейс:
-ip addr show tap0
-
-# Идёт ли трафик через TAP:
-sudo tcpdump -i tap0 -n
-
-# Идёт ли VPN-трафик по UDP наружу:
-sudo tcpdump -i any -n udp port 5555
-
-# Проверить что segmentation offload реально выключен:
-ethtool -k tap0 | grep -E 'tcp-seg|gen-seg|gen-rec|large-rec'
-# всё должно быть: off [fixed] или off
-
-# Проверить что MSS-правила висят:
-sudo iptables -t mangle -L OUTPUT -v -n | grep tap0
-sudo iptables -t mangle -L INPUT  -v -n | grep tap0
-
-# Статистика пиров — смотри лог процесса main.py,
-# каждые 5 секунд печатается таблица alive/pending/dead.
+sudo install -m 644 packaging/p2pvpn.service /etc/systemd/system/p2pvpn.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now p2pvpn
+sudo systemctl status p2pvpn
+sudo journalctl -u p2pvpn -f
+sudo systemctl restart p2pvpn
+sudo systemctl stop p2pvpn
 ```
 
-### «Ping проходит, а всё остальное падает» — что проверить
+Unit запускает сервис с CAP_NET_ADMIN и закрытым управляющим сокетом.
+При systemd используйте journal. Для запуска вручную можно задать `log_file`
+(родительская папка должна существовать). Уровень в `log_level` применяется
+при запуске; команда `log-level` меняет его до перезапуска.
+Ни unit, ни firewall автоматически установкой Python-пакета не изменяются.
 
-Почти всегда это MTU/offload. Код должен это отключать автоматически,
-но если нет ethtool или iptables, фикс не применится. Проверь вручную:
+## API для будущих приложений
+
+Unix-сокет `/run/p2pvpn/control.sock`, одна JSON-строка на соединение:
+
+```json
+{"command":"resolve","name":"bob"}
+```
+
+Ответ: `{"ok":true,"result":{"name":"bob","ip":"10.77.0.2", ...}}`
+или `{"ok":false,"error":"..."}`. Команды: status, peers, resolve, connect,
+log-level (`level`), stop. CLI — клиент этого же API; режим `--json` пригоден
+для скриптов. Через API передаются только команды, не прикладные сообщения:
+мессенджер использует найденный IP и свой транспорт поверх виртуальной LAN.
+В Python можно встраивать `Engine`, передав реализации `Link`, `Transport`,
+`Discovery`; Linux и CLI не нужны доменной логике.
+
+## Проверки без root
+
+Для discovery-only режима задайте `"headless": true`, адрес прослушивания
+`127.0.0.1:...` и `"socket": "/tmp/p2pvpn-alice/control.sock"`.
+Для каждого узла нужны разные UDP-порты и каталог сокета.
+Этот режим использует настоящий DHT/UDP, но **не создаёт TAP и не переносит
+трафик приложений**.
 
 ```bash
-# 1) Отключить offload на TAP:
-sudo ethtool -K tap0 tso off gso off gro off lro off tx off sg off
-
-# 2) Зажать MSS (MTU tap0 - 40):
-sudo iptables -t mangle -A OUTPUT -o tap0 -p tcp --tcp-flags SYN,RST SYN \
-     -j TCPMSS --set-mss 1380
-sudo iptables -t mangle -A INPUT  -i tap0 -p tcp --tcp-flags SYN,RST SYN \
-     -j TCPMSS --set-mss 1380
-
-# 3) Проверить реальный рабочий размер через ping с DF-битом:
-ping -M do -s 1392 10.0.0.2   # должен пройти (1392+8 ICMP+20 IP = 1420 MTU)
-ping -M do -s 1393 10.0.0.2   # должен "Message too long" — ок, это предел
+uv pip install --python .venv/bin/python pytest pytest-asyncio
+.venv/bin/python -m pytest -q
 ```
-# P2PLocalGame
+
+Тесты проверяют валидацию, шифрование/replay, MAC-маршрутизацию, конфликт IP,
+IPC-lock, три DHT/UDP-узла с доставкой кадров и отдельный процесс демона:
+CLI, логи, stop, SIGTERM, повторный запуск. Нужны разрешённые локальные сокеты.
+Реальный TAP, firewall, игры и соединение через интернет требуют проверки
+на двух Linux-машинах; эти тесты её не заменяют.
+
+## Границы реализации
+
+- Это рабочая начальная реализация, не проверенный промышленный VPN.
+- Автоматические STUN/hole punching, UPnP, relay для CGNAT/симметричного NAT
+  ещё не реализованы в новом ядре. При недоступных UDP-портах DHT этого не исправит.
+- Рой — доверенная группа, до 256 пиров. Общий ключ не даёт индивидуального
+  удостоверения личности: участник группы может выдавать себя за другого.
+  Для публичного мессенджера нужны постоянные ключи личности, подписи записей
+  и отдельное сквозное шифрование сообщений.
+- Нельзя гарантировать уникальность имён во всей распределённой сети:
+  локальные коллизии IP обнаруживаются, конкурентная публикация одного имени
+  требует отдельной политики владения именами.
+- IPv4 underlay; MTU 1200. Нет фрагментации поверх UDP и гарантии доставки кадров.
+  TCP приложений выполняет свои повторы. Нужны синхронизированные часы (окно 30 с).
+- Топология — прямые соединения между пирами. Транзит через третьего пира,
+  L3 gateway, выборочная маршрутизация конкретного процесса и системный DNS/NSS
+  пока отсутствуют. Имя разрешается через `resolve`/API, не через `getaddrinfo`.
+- Остановка узла оставляет DHT-запись до истечения TTL; это ожидаемо.
+
+Архитектура: [ARCHITECTURE.md](ARCHITECTURE.md). Старые `plan/`, `tasks/`,
+`roadmap.md` — исторический план ветки attempt2, а не статус новой реализации.

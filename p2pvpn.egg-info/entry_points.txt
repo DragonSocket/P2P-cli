@@ -1,0 +1,2 @@
+[console_scripts]
+p2pvpn = p2pvpn.cli:main

@@ -1,0 +1,27 @@
+[Unit]
+Description=P2P virtual LAN daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/opt/p2pvpn/.venv/bin/p2pvpn run --config /etc/p2pvpn/node.json
+Restart=on-failure
+RestartSec=5
+RuntimeDirectory=p2pvpn
+RuntimeDirectoryMode=0700
+UMask=0077
+CapabilityBoundingSet=CAP_NET_ADMIN
+AmbientCapabilities=CAP_NET_ADMIN
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/run/p2pvpn
+PrivateTmp=true
+DevicePolicy=closed
+DeviceAllow=/dev/net/tun rw
+RestrictAddressFamilies=AF_UNIX AF_INET AF_NETLINK
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
